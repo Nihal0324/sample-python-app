@@ -33,5 +33,25 @@ plt.xticks(rotation=45)
 plt.grid(axis="y")
 
 # Save the graph
-plt.savefig("trivy_vulnerabilities.png")
-plt.show()
+graph_path = "trivy_vulnerabilities.png"
+plt.savefig(graph_path)
+plt.close()
+
+# Create HTML file
+html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trivy Vulnerability Report</title>
+</head>
+<body>
+    <h1>Trivy Vulnerability Scan Report</h1>
+    <img src="{graph_path}" alt="Trivy Vulnerability Graph">
+</body>
+</html>
+"""
+
+with open("trivy_graph.html", "w") as f:
+    f.write(html_content)
+
+print("✅ Trivy graph and HTML report generated successfully!")
