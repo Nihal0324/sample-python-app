@@ -15,7 +15,7 @@ for result in data.get("Results", []):
             "Severity": vuln["Severity"],
             "Package": vuln["PkgName"],
             "Installed Version": vuln["InstalledVersion"],
-            "Description": vuln.get("Description", "No description available")
+            "Description": vuln.get("Description", "No description")
         })
 
 # Convert to DataFrame
@@ -38,43 +38,21 @@ graph_path = "trivy_vulnerabilities.png"
 plt.savefig(graph_path)
 plt.close()
 
-# Create HTML report with interactive filtering
+# Create HTML report with vulnerabilities + graph
 html_content = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Trivy Vulnerability Report</title>
     <style>
-        body {{ font-family: Arial, sans-serif; }}
-        h1 {{ text-align: center; }}
-        table {{ width: 100%; border-collapse: collapse; }}
+        table {{ border-collapse: collapse; width: 100%; }}
         th, td {{ border: 1px solid black; padding: 8px; text-align: left; }}
-        th {{ background-color: #f2f2f2; cursor: pointer; }}
-        .hidden {{ display: none; }}
-        .filter-buttons button {{ margin: 5px; padding: 10px; font-size: 14px; }}
+        th {{ background-color: #f2f2f2; }}
     </style>
-    <script>
-        function filterSeverity(severity) {{
-            let rows = document.querySelectorAll("tr[data-severity]");
-            rows.forEach(row => {{
-                row.style.display = (severity === 'ALL' || row.getAttribute("data-severity") === severity) ? "" : "none";
-            }});
-        }}
-    </script>
 </head>
 <body>
     <h1>Trivy Vulnerability Report</h1>
     <img src="{graph_path}" alt="Trivy Vulnerability Graph" width="600">
-
-    <h2>Filter by Severity:</h2>
-    <div class="filter-buttons">
-        <button onclick="filterSeverity('ALL')">ALL</button>
-        <button onclick="filterSeverity('CRITICAL')" style="background-color: red; color: white;">CRITICAL</button>
-        <button onclick="filterSeverity('HIGH')" style="background-color: orange; color: white;">HIGH</button>
-        <button onclick="filterSeverity('MEDIUM')" style="background-color: yellow;">MEDIUM</button>
-        <button onclick="filterSeverity('LOW')" style="background-color: green; color: white;">LOW</button>
-    </div>
-
     <h2>Vulnerability Details</h2>
     <table>
         <tr>
@@ -86,10 +64,10 @@ html_content = f"""
         </tr>
 """
 
-# Add vulnerabilities to the HTML table with severity filtering
+# Add vulnerabilities to the HTML table
 for _, row in df.iterrows():
     html_content += f"""
-        <tr data-severity="{row["Severity"]}">
+        <tr>
             <td>{row["ID"]}</td>
             <td>{row["Severity"]}</td>
             <td>{row["Package"]}</td>
