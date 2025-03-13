@@ -1,6 +1,5 @@
 import json
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Load Trivy JSON output
 with open("trivy_output.json") as f:
@@ -11,47 +10,17 @@ vulnerabilities = []
 for result in data.get("Results", []):
     for vuln in result.get("Vulnerabilities", []):
         vulnerabilities.append({
-            "ID": vuln["VulnerabilityID"],
-            "Severity": vuln["Severity"],
-            "Package": vuln["PkgName"],
-            "Installed Version": vuln["InstalledVersion"]
+            "Severity": vuln["Severity"]
         })
 
 # Convert to DataFrame
 df = pd.DataFrame(vulnerabilities)
 
 # Count vulnerabilities by severity
-severity_counts = df["Severity"].value_counts()
+severity_counts = df["Severity"].value_counts().sort_index()
 
-# Plot the vulnerability distribution
-plt.figure(figsize=(8, 6))
-severity_counts.plot(kind="bar", color=["green", "yellow", "orange", "red"])
-plt.xlabel("Severity")
-plt.ylabel("Count")
-plt.title("Vulnerabilities by Severity (Trivy Scan)")
-plt.xticks(rotation=45)
-plt.grid(axis="y")
+# Save as CSV for Jenkins Plot Plugin
+csv_path = "trivy_vulnerability_data.csv"
+severity_counts.to_csv(csv_path, header=["Count"])
 
-# Save the graph
-graph_path = "trivy_vulnerabilities.png"
-plt.savefig(graph_path)
-plt.close()
-
-# Create HTML file
-html_content = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Trivy Vulnerability Report</title>
-</head>
-<body>
-    <h1>Trivy Vulnerability Scan Report</h1>
-    <img src="{graph_path}" alt="Trivy Vulnerability Graph">
-</body>
-</html>
-"""
-
-with open("trivy_graph.html", "w") as f:
-    f.write(html_content)
-
-print("✅ Trivy graph and HTML report generated successfully!")
+print(f"✅ Trivy graph data saved: {csv_path}")
