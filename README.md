@@ -1,4 +1,4 @@
-# Sample containerized Python application
+# Sample containerized Python applications
 
 This repo contains a sample application to deploy to Kubernetes. The application is a simple HelloWorld app using Python and Flask framework.
 
